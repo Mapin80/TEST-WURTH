@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Würth Italia — Test Attitudinale Avanzato</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Arial, sans-serif; background: #f4f4f4; color: #1a1a1a; min-height: 100vh; }
+  .header {
+    background: #cc0000; color: #fff; padding: 16px 24px;
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  }
+  .header-logo { font-size: 22px; font-weight: 900; letter-spacing: 2px; }
+  .header-sub { font-size: 11px; opacity: 0.85; }
+  .progress-bar { background: rgba(255,255,255,0.3); border-radius: 10px; height: 8px; width: 180px; overflow: hidden; }
+  .progress-fill { background: #fff; height: 100%; border-radius: 10px; transition: width 0.4s ease; }
+  .container { max-width: 740px; margin: 0 auto; padding: 28px 18px; }
+
+  .intro-card { background:#fff; border-radius:12px; padding:36px 32px; box-shadow:0 4px 20px rgba(0,0,0,0.08); text-align:center; }
+  .intro-card h1 { color:#cc0000; font-size:24px; margin-bottom:10px; }
+  .intro-card p { color:#555; font-size:14px; line-height:1.7; margin-bottom:16px; }
+  .info-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:18px 0; text-align:left; }
+  .info-item { background:#fafafa; border:1px solid #eee; border-radius:8px; padding:10px 12px; }
+  .info-label { color:#cc0000; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:1px; margin-bottom:3px; }
+  .info-val { font-size:13px; color:#333; font-weight:600; }
+  .form-group { text-align:left; margin-bottom:14px; }
+  .form-group label { display:block; font-size:12px; font-weight:700; color:#333; margin-bottom:5px; }
+  .form-group input { width:100%; padding:10px 12px; border:2px solid #e0e0e0; border-radius:8px; font-size:14px; font-family:Arial; transition:border 0.2s; }
+  .form-group input:focus { outline:none; border-color:#cc0000; }
+
+  .quiz-card { background:#fff; border-radius:12px; padding:32px 28px; box-shadow:0 4px 20px rgba(0,0,0,0.08); animation:fadeIn 0.3s ease; }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+  .question-meta { display:flex; align-items:center; gap:10px; margin-bottom:16px; flex-wrap:wrap; }
+  .q-num { background:#cc0000; color:#fff; font-size:11px; font-weight:700; padding:3px 10px; border-radius:20px; white-space:nowrap; }
+  .q-cat { color:#cc0000; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:1px; }
+  .q-trap { background:#8B0000; color:#fff; font-size:10px; font-weight:700; padding:2px 8px; border-radius:10px; }
+  .question-text { font-size:16px; font-weight:700; color:#1a1a1a; line-height:1.55; margin-bottom:24px; padding:18px; background:#fff5f5; border-left:4px solid #cc0000; border-radius:0 8px 8px 0; }
+
+  .option { border:2px solid #e8e8e8; border-radius:10px; padding:14px 16px; margin-bottom:10px; cursor:pointer; transition:all 0.2s; display:flex; align-items:flex-start; gap:12px; }
+  .option:hover { border-color:#cc0000; background:#fff5f5; }
+  .option.selected { border-color:#cc0000; background:#fff5f5; }
+  .option input[type="radio"] { display:none; }
+  .option-letter { width:30px; height:30px; border-radius:50%; border:2px solid #ddd; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:13px; flex-shrink:0; transition:all 0.2s; color:#999; }
+  .option.selected .option-letter { background:#cc0000; border-color:#cc0000; color:#fff; }
+  .option-text { font-size:13px; line-height:1.5; color:#444; padding-top:4px; }
+
+  .nav-row { display:flex; align-items:center; justify-content:space-between; margin-top:24px; }
+  .step-info { color:#999; font-size:12px; }
+  .btn { padding:12px 24px; border-radius:8px; font-size:14px; font-weight:700; border:none; cursor:pointer; transition:all 0.2s; font-family:Arial; }
+  .btn-primary { background:#cc0000; color:#fff; }
+  .btn-primary:hover { background:#a80000; }
+  .btn-primary:disabled { background:#ddd; color:#aaa; cursor:not-allowed; }
+  .btn-secondary { background:#f0f0f0; color:#555; }
+  .btn-secondary:hover { background:#e0e0e0; }
+  .btn-large { padding:15px 36px; font-size:15px; width:100%; margin-top:14px; border-radius:10px; }
+
+  .section-divider { background:#1a1a1a; color:#fff; border-radius:12px; padding:18px 22px; margin-bottom:16px; text-align:center; }
+  .section-divider h2 { font-size:15px; letter-spacing:1px; }
+  .section-divider p { font-size:11px; opacity:0.7; margin-top:3px; }
+
+  .result-card { background:#fff; border-radius:12px; padding:36px 32px; box-shadow:0 4px 20px rgba(0,0,0,0.08); text-align:center; }
+  .score-circle { width:120px; height:120px; border-radius:50%; margin:0 auto 20px; display:flex; flex-direction:column; align-items:center; justify-content:center; font-size:32px; font-weight:900; color:#fff; }
+  .score-label { font-size:11px; font-weight:700; letter-spacing:1px; }
+  .verdict { font-size:19px; font-weight:900; margin-bottom:6px; }
+  .verdict-sub { color:#666; font-size:13px; margin-bottom:24px; }
+  .cat-grid { display:grid; grid-template-columns:1fr 1fr; gap:9px; margin:16px 0; text-align:left; }
+  .cat-item { background:#fafafa; border-radius:8px; padding:10px 12px; border:1px solid #eee; }
+  .cat-name { font-size:10px; font-weight:700; color:#999; text-transform:uppercase; letter-spacing:1px; margin-bottom:3px; }
+  .cat-score { font-size:17px; font-weight:900; }
+  .sending-msg { color:#555; font-size:13px; margin-top:10px; }
+  .thank-you { padding:50px 20px; text-align:center; }
+  .thank-you h2 { color:#cc0000; font-size:22px; margin-bottom:10px; }
+  .thank-you p { color:#555; font-size:14px; line-height:1.7; }
+  .checkmark { font-size:56px; margin-bottom:14px; }
+  .hidden { display:none !important; }
+  @media(max-width:500px){ .info-grid,.cat-grid{grid-template-columns:1fr} .quiz-card{padding:20px 15px} .question-text{font-size:14px} }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <div class="header-logo">WÜRTH</div>
+    <div class="header-sub">Test Attitudinale — Distretto Sardegna</div>
+  </div>
+  <div style="text-align:right">
+    <div style="font-size:11px;opacity:0.8;margin-bottom:5px" id="progress-text">Inizio</div>
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- INTRO -->
+  <div id="screen-intro">
+    <div class="intro-card">
+      <div style="font-size:44px;margin-bottom:10px">🧠</div>
+      <h1>Test Attitudinale Avanzato</h1>
+      <p>Questo test valuta il tuo profilo psicologico e attitudinale per il ruolo commerciale Würth.<br>Risponda con sincerità — non esistono risposte giuste o sbagliate, esistono profili adatti o inadatti.</p>
+      <div class="info-grid">
+        <div class="info-item"><div class="info-label">Domande totali</div><div class="info-val">25 domande</div></div>
+        <div class="info-item"><div class="info-label">Durata stimata</div><div class="info-val">25–35 minuti</div></div>
+        <div class="info-item"><div class="info-label">Aree valutate</div><div class="info-val">8 categorie</div></div>
+        <div class="info-item"><div class="info-label">Punteggio massimo</div><div class="info-val">250 punti</div></div>
+      </div>
+      <hr style="border:none;border-top:1px solid #eee;margin:18px 0">
+      <div class="form-group"><label>Nome e Cognome *</label><input type="text" id="f-nome" placeholder="Es. Mario Rossi" required></div>
+      <div class="form-group"><label>Email *</label><input type="email" id="f-email" placeholder="mario.rossi@email.it" required></div>
+      <div class="form-group"><label>Telefono</label><input type="tel" id="f-tel" placeholder="+39 333 1234567"></div>
+      <div class="form-group"><label>Anni di esperienza commerciale</label><input type="text" id="f-esp" placeholder="Es. 5 anni"></div>
+      <button class="btn btn-primary btn-large" onclick="startQuiz()">Inizia il Test →</button>
+    </div>
+  </div>
+
+  <!-- QUIZ -->
+  <div id="screen-quiz" class="hidden">
+    <div id="quiz-content"></div>
+    <div class="nav-row">
+      <button class="btn btn-secondary" id="btn-prev" onclick="prevQ()">← Indietro</button>
+      <span class="step-info" id="step-info"></span>
+      <button class="btn btn-primary" id="btn-next" onclick="nextQ()" disabled>Avanti →</button>
+    </div>
+  </div>
+
+  <!-- RISULTATO -->
+  <div id="screen-result" class="hidden">
+    <div class="result-card">
+      <div class="score-circle" id="score-circle">
+        <div id="score-num" style="line-height:1">--</div>
+        <div class="score-label">/ 250</div>
+      </div>
+      <div class="verdict" id="verdict-text"></div>
+      <div class="verdict-sub" id="verdict-sub"></div>
+      <hr style="border:none;border-top:1px solid #eee;margin:18px 0">
+      <div style="text-align:left;margin-bottom:10px;font-size:12px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:1px">Punteggio per area</div>
+      <div class="cat-grid" id="cat-grid"></div>
+      <div class="sending-msg" id="sending-msg">Invio risultati in corso...</div>
+    </div>
+  </div>
+
+  <!-- GRAZIE -->
+  <div id="screen-thanks" class="hidden">
+    <div class="result-card thank-you">
+      <div class="checkmark">✅</div>
+      <h2>Grazie per aver completato il test!</h2>
+      <p>I tuoi risultati sono stati inviati al responsabile del distretto.<br>Verrai contattato nei prossimi giorni.<br><br><strong>Würth Italia — Distretto Sardegna RVD 10387</strong></p>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const D = [
+  // ── GESTIONE STRESS ────────────────────────────────────────────────
+  { cat:"Gestione Stress", trap:false,
+    q:"Hai appena perso un cliente importante che ti valeva €5.000 al mese. È venerdì pomeriggio. Come passi il weekend?",
+    opts:[
+      {k:"a", t:"Ci penso ma riesco a staccare. Lunedì mattina ho già un piano per recuperare.", p:10},
+      {k:"b", t:"Il weekend lo passo a rimuginare. Non riesco a non pensarci e mi pesa molto.", p:4},
+      {k:"c", t:"Stacco completamente — il lavoro finisce il venerdì. Lunedì si vedrà.", p:6},
+      {k:"d", t:"Chiamo subito altri clienti già nel weekend per compensare. Non mi fermo.", p:8},
+    ]},
+  { cat:"Gestione Stress", trap:false,
+    q:"Il tuo responsabile ti chiama alle 7:30 del mattino per dirti che sei il fanalino di coda del distretto. Come reagisci?",
+    opts:[
+      {k:"a", t:"Accetto il dato, ringrazio per il feedback diretto e chiedo cosa devo cambiare subito.", p:10},
+      {k:"b", t:"Mi difendo spiegando le ragioni del momento difficile — il mercato, i clienti, la zona.", p:3},
+      {k:"c", t:"Mi innervosisce ma non lo dico. Internamente però mi faccio prendere dall'ansia.", p:5},
+      {k:"d", t:"Mi fa arrabbiare ma mi trasforma quella rabbia in carburante per la giornata.", p:8},
+    ]},
+  { cat:"Gestione Stress", trap:true,
+    q:"ATTENZIONE: Questo lavoro richiede di gestire pressioni costanti, obiettivi mensili, clienti difficili e un responsabile esigente. Onestamente, quanto ti pesa questo tipo di ambiente?",
+    opts:[
+      {k:"a", t:"Non mi pesa affatto — è esattamente il tipo di ambiente in cui rendo di più.", p:10},
+      {k:"b", t:"All'inizio sì, poi ci si abitua. Ho bisogno di qualche mese per adattarmi.", p:5},
+      {k:"c", t:"Mi pesa abbastanza. Preferisco ambienti meno pressanti e più collaborativi.", p:1},
+      {k:"d", t:"Mi pesa solo quando la pressione non è bilanciata da riconoscimento e risultati.", p:7},
+    ]},
+
+  // ── OBIETTIVI ──────────────────────────────────────────────────────
+  { cat:"Obiettivi Mensili", trap:false,
+    q:"Sei al 60% del target il 20 del mese. Mancano 7 giorni. Cosa fai?",
+    opts:[
+      {k:"a", t:"Piano di recupero immediato: identifico i 10 clienti con ordini potenziali e li contatto oggi stesso.", p:10},
+      {k:"b", t:"Ci provo ma so già che sarà difficile. Recuperare il 40% in una settimana non è realistico.", p:2},
+      {k:"c", t:"Intensifico le visite e le chiamate. Non so se ce la faccio ma ci metto tutto.", p:7},
+      {k:"d", t:"Parlo con il mio responsabile per capire se posso avere supporto o se il target è rinegoziabile.", p:4},
+    ]},
+  { cat:"Obiettivi Mensili", trap:true,
+    q:"Il tuo target mensile ti sembra troppo alto rispetto alla tua zona. Cosa fai?",
+    opts:[
+      {k:"a", t:"Lo dico apertamente al responsabile con dati alla mano e propongo un target più realistico.", p:4},
+      {k:"b", t:"Lavoro sul target assegnato senza discuterlo. Se non lo raggiungo, spiego le ragioni dopo.", p:6},
+      {k:"c", t:"Accetto il target e lavoro per superarlo comunque — i limiti spesso sono nella testa.", p:10},
+      {k:"d", t:"Lo trovo demotivante. Un target irrealistico mi toglie la voglia di provarci.", p:1},
+    ]},
+  { cat:"Obiettivi Mensili", trap:false,
+    q:"Hai superato il target di aprile del 130%. Come arrivi a maggio?",
+    opts:[
+      {k:"a", t:"Con la stessa energia. Voglio fare ancora meglio — il 130% di aprile è il nuovo punto di partenza.", p:10},
+      {k:"b", t:"Un po' più rilassato. Mi sono guadagnato un mese più tranquillo.", p:1},
+      {k:"c", t:"Preoccupato — il mese prossimo mi aspetteranno un target più alto e sarà più difficile.", p:3},
+      {k:"d", t:"Motivato ma consapevole che ogni mese è diverso. Ricomincio da zero con determinazione.", p:8},
+    ]},
+
+  // ── RESPONSABILITA ─────────────────────────────────────────────────
+  { cat:"Responsabilita", trap:false,
+    q:"Un cliente si lamenta di non aver ricevuto un ordine che era urgente. Colpa della logistica. Cosa dici al cliente?",
+    opts:[
+      {k:"a", t:"Mi scuso personalmente, mi prendo la responsabilita e mi attivo subito per risolvere.", p:10},
+      {k:"b", t:"Spiego che il problema e della logistica e non dipende da me.", p:2},
+      {k:"c", t:"Mi scuso e spiego la situazione, promettendo di fare pressione internamente.", p:7},
+      {k:"d", t:"Offro uno sconto sul prossimo ordine come compensazione.", p:5},
+    ]},
+  { cat:"Responsabilita", trap:true,
+    q:"Hai mancato il target per 3 mesi consecutivi. Il responsabile ti chiede la causa. Cosa rispondi?",
+    opts:[
+      {k:"a", t:"Zona difficile, mercato in calo, concorrenza aggressiva — i fattori esterni hanno pesato molto.", p:1},
+      {k:"b", t:"Ho sbagliato la prioritizzazione dei clienti e l'approccio su alcuni segmenti. Ecco cosa cambio.", p:10},
+      {k:"c", t:"Non ho avuto abbastanza supporto e strumenti dall'azienda per competere efficacemente.", p:2},
+      {k:"d", t:"E' stata una combinazione di fattori miei e esterni. Sto gia lavorando su quelli che dipendono da me.", p:7},
+    ]},
+  { cat:"Responsabilita", trap:false,
+    q:"Scopri di aver comunicato al cliente un prezzo sbagliato (troppo basso) e hai gia confermato l'ordine. Cosa fai?",
+    opts:[
+      {k:"a", t:"Chiamo il cliente, mi scuso e spiego l'errore. Propongo il prezzo corretto o trovo una soluzione.", p:10},
+      {k:"b", t:"Assorbo la differenza e non dico nulla. Non voglio perdere il cliente.", p:4},
+      {k:"c", t:"Parlo con il responsabile per capire se possiamo onorare il prezzo sbagliato.", p:7},
+      {k:"d", t:"Mando una email al cliente dicendo che c'e stato un errore di sistema e il prezzo e cambiato.", p:2},
+    ]},
+
+  // ── VITA PRIVATA E LAVORO ──────────────────────────────────────────
+  { cat:"Work-Life Balance", trap:false,
+    q:"E' la sera del 23 dicembre. Un cliente importante ti chiama per un ordine urgente da evadere entro Natale. Cosa fai?",
+    opts:[
+      {k:"a", t:"Lo gestisco subito. I clienti importanti non si lasciano aspettare, neanche a Natale.", p:10},
+      {k:"b", t:"Lo ascolto, prendo nota e lo informo che non posso garantire nulla prima del 27.", p:6},
+      {k:"c", t:"Non rispondo. Sono in ferie e ho diritto al riposo. Lo richiamo il 27.", p:2},
+      {k:"d", t:"Rispondo, valuto l'urgenza reale e se e davvero critico mi attivo, altrimenti rimando.", p:8},
+    ]},
+  { cat:"Work-Life Balance", trap:true,
+    q:"DOMANDA DIRETTA: Questo lavoro richiede spesso orari estesi, weekend di pianificazione e disponibilita quasi continua. La tua famiglia o partner e d'accordo con questo stile di vita?",
+    opts:[
+      {k:"a", t:"Si, lo capiscono perfettamente e mi supportano al 100%.", p:10},
+      {k:"b", t:"A volte ci sono tensioni ma le gestisco. Il lavoro non interferisce con la famiglia.", p:6},
+      {k:"c", t:"E' un tema delicato. Sto ancora trovando il giusto equilibrio.", p:3},
+      {k:"d", t:"Non l'ho ancora discusso con loro. Non vedo perche debba essere un problema.", p:4},
+    ]},
+  { cat:"Work-Life Balance", trap:false,
+    q:"Dopo un mese particolarmente intenso e stressante, come recuperi le energie?",
+    opts:[
+      {k:"a", t:"Sport, sonno e tempo con la famiglia. Ricarico le pile per essere al massimo il mese dopo.", p:10},
+      {k:"b", t:"Ho bisogno di qualche settimana per smaltire. Lo stress si accumula e ci vuole tempo.", p:4},
+      {k:"c", t:"Non mi fermo — rallentare mi fa perdere il ritmo. Preferisco mantenere alta la velocita.", p:6},
+      {k:"d", t:"Stacco completamente dal lavoro. Non rispondo a email ne a telefonate per qualche giorno.", p:3},
+    ]},
+
+  // ── ATTITUDINALI ───────────────────────────────────────────────────
+  { cat:"Attitudinali", trap:false,
+    q:"Scegli l'affermazione che ti descrive meglio:",
+    opts:[
+      {k:"a", t:"Preferisco avere obiettivi chiari e autonomia nel modo in cui li raggiungo.", p:10},
+      {k:"b", t:"Lavoro meglio con istruzioni precise e un metodo definito da seguire passo per passo.", p:4},
+      {k:"c", t:"Mi adatto a qualsiasi situazione — posso lavorare sia con autonomia che con supervisione.", p:7},
+      {k:"d", t:"Preferisco lavorare in team dove c'e scambio continuo e supporto reciproco.", p:3},
+    ]},
+  { cat:"Attitudinali", trap:true,
+    q:"Un collega ottiene risultati migliori dei tuoi usando un metodo che consideri scorretto o poco etico. Cosa fai?",
+    opts:[
+      {k:"a", t:"Lo segnalo al responsabile — certe pratiche non sono accettabili.", p:6},
+      {k:"b", t:"Lo ignoro e mi concentro sui miei risultati con i miei metodi.", p:8},
+      {k:"c", t:"Gli chiedo come funziona. Se e efficace, voglio capire cosa sta facendo.", p:4},
+      {k:"d", t:"Adotto anch'io quel metodo. I risultati contano e non voglio restare indietro.", p:1},
+    ]},
+  { cat:"Attitudinali", trap:false,
+    q:"Come preferisci ricevere feedback dal tuo responsabile?",
+    opts:[
+      {k:"a", t:"Diretto e frequente, anche se e critico. Voglio sapere dove migliorare subito.", p:10},
+      {k:"b", t:"Positivo e costruttivo. Le critiche devono essere bilanciate con i riconoscimenti.", p:5},
+      {k:"c", t:"Solo quando necessario. Preferisco lavorare con autonomia senza supervisione continua.", p:6},
+      {k:"d", t:"Per iscritto, cosi posso rifletterci con calma prima di rispondere.", p:4},
+    ]},
+
+  // ── PROBLEM SOLVING ────────────────────────────────────────────────
+  { cat:"Problem Solving", trap:false,
+    q:"Stai per chiudere un contratto importante. Il giorno prima della firma il cliente ti dice che un concorrente ha offerto lo stesso prodotto al 20% in meno. Cosa fai nelle prossime 2 ore?",
+    opts:[
+      {k:"a", t:"Chiamo il responsabile per capire i margini di manovra, poi richiamo il cliente con una controproposta concreta.", p:10},
+      {k:"b", t:"Accetto di perdere l'ordine — non posso competere su quel prezzo senza autorizzazione.", p:2},
+      {k:"c", t:"Chiamo il cliente e cerco di capire se il prezzo e l'unico fattore o se posso valorizzare altro.", p:9},
+      {k:"d", t:"Propongo al cliente di dividere l'ordine: una parte a noi, una parte al concorrente.", p:3},
+    ]},
+  { cat:"Problem Solving", trap:false,
+    q:"Il tuo CRM va in crash e perdi tutti i dati delle visite pianificate per la settimana. Cosa fai?",
+    opts:[
+      {k:"a", t:"Ricostruisco la lista a memoria o dai miei appunti e ripartenza della giornata come previsto.", p:10},
+      {k:"b", t:"Aspetto che il sistema venga ripristinato — senza dati non posso lavorare in modo efficace.", p:1},
+      {k:"c", t:"Chiamo l'assistenza tecnica e nel frattempo lavoro sui clienti che ricordo a memoria.", p:8},
+      {k:"d", t:"E' uno di quei giorni — me la prendo con calma e recupero la settimana dopo.", p:2},
+    ]},
+  { cat:"Problem Solving", trap:true,
+    q:"Hai 3 clienti critici da visitare, una riunione interna obbligatoria e un report da consegnare — tutto nello stesso giorno. Come gestisci?",
+    opts:[
+      {k:"a", t:"Prioritizzo i clienti critici, chiedo di rimandare la riunione o di parteciparvi in call, e consegno il report la sera.", p:10},
+      {k:"b", t:"Vado alla riunione (obbligatoria), visito un cliente e dico agli altri che torno domani.", p:5},
+      {k:"c", t:"E impossibile fare tutto — chiedo al responsabile di aiutarmi a stabilire le priorita.", p:6},
+      {k:"d", t:"Faccio tutto alla svelta, senza soffermarmi troppo su nessuno. Meglio un po' di tutto che niente.", p:3},
+    ]},
+
+  // ── MOTIVAZIONALI ──────────────────────────────────────────────────
+  { cat:"Motivazione", trap:false,
+    q:"Cosa ti motiva di piu in un lavoro commerciale? Scegli la risposta piu onesta.",
+    opts:[
+      {k:"a", t:"Vincere. Chiudere una trattativa, superare il target, essere primo in classifica.", p:10},
+      {k:"b", t:"Il rapporto con i clienti. Mi piace costruire relazioni di lungo periodo.", p:7},
+      {k:"c", t:"La retribuzione. Voglio guadagnare bene e questo lavoro me lo permette.", p:5},
+      {k:"d", t:"La crescita professionale. Voglio imparare e avanzare di carriera.", p:6},
+    ]},
+  { cat:"Motivazione", trap:false,
+    q:"Dopo 6 mesi consecutivi di target mancato, come stai?",
+    opts:[
+      {k:"a", t:"Analizzato cosa non ha funzionato, cambiato approccio e ripartito con ancora piu fame.", p:10},
+      {k:"b", t:"Demotivato. Comincio a chiedermi se questo lavoro fa per me.", p:1},
+      {k:"c", t:"Stanco ma ancora determinato. So che i risultati arriveranno se continuo a lavorare bene.", p:7},
+      {k:"d", t:"Comincio a guardare altre opportunita. Non ha senso persistere se i risultati non arrivano.", p:2},
+    ]},
+  { cat:"Motivazione", trap:true,
+    q:"Il tuo collega guadagna il doppio di te grazie alle provvigioni. Come ti senti?",
+    opts:[
+      {k:"a", t:"Motivato. Vuol dire che e possibile — voglio capire come fa e superarlo.", p:10},
+      {k:"b", t:"Un po' invidioso, ma cerco di non pensarci e mi concentro sui miei risultati.", p:5},
+      {k:"c", t:"Frustrato. Se lavoriamo nella stessa zona, forse i miei clienti sono peggiori.", p:2},
+      {k:"d", t:"Curioso. Lo avvicino, gli chiedo consigli e imparo dal suo metodo.", p:8},
+    ]},
+
+  // ── DOMANDE TRABOCCHETTO ───────────────────────────────────────────
+  { cat:"Trabocchetto", trap:true,
+    q:"TRAP: Quanto e importante per te avere un orario di lavoro definito e rispettato?",
+    opts:[
+      {k:"a", t:"Molto importante. Ho una vita privata e ho bisogno di confini chiari tra lavoro e tempo libero.", p:1},
+      {k:"b", t:"Abbastanza importante. Lavoro bene con struttura ma sono flessibile quando serve.", p:6},
+      {k:"c", t:"Non mi interessa l'orario — mi interessa il risultato. Lavoro finche serve.", p:10},
+      {k:"d", t:"Dipende dal periodo. Nei momenti intensi accetto orari estesi, poi recupero.", p:7},
+    ]},
+  { cat:"Trabocchetto", trap:true,
+    q:"TRAP: Il tuo responsabile ti chiama alle 20:00 per discutere un cliente. Sei a cena con la famiglia. Cosa fai?",
+    opts:[
+      {k:"a", t:"Rispondo subito — il responsabile ha priorita e il cliente potrebbe essere urgente.", p:8},
+      {k:"b", t:"Lascio squillare e richiamo dopo cena entro 30 minuti.", p:10},
+      {k:"c", t:"Non rispondo. Gli mando un messaggio: 'Sono in famiglia, ti chiamo domani.'", p:3},
+      {k:"d", t:"Rispondo, ascolto e valuto se e urgente. Se non lo e, dico che lo richiamo dopo.", p:9},
+    ]},
+  { cat:"Trabocchetto", trap:true,
+    q:"TRAP FINALE: Se potessi ridisegnare questo ruolo, cosa cambieresti?",
+    opts:[
+      {k:"a", t:"Nulla. Mi piace cosi com'e — la pressione e gli obiettivi fanno parte del gioco.", p:10},
+      {k:"b", t:"Meno pressione sugli obiettivi mensili — preferirei target trimestrali.", p:2},
+      {k:"c", t:"Piu supporto nella gestione amministrativa per concentrarmi solo sulla vendita.", p:7},
+      {k:"d", t:"Un territorio piu ampio con piu clienti potenziali per raggiungere i target con piu facilita.", p:4},
+    ]},
+];
+
+const CATEGORIE_EVAL = [
+  { nome:"Gestione Stress", idx:[0,1,2] },
+  { nome:"Obiettivi Mensili", idx:[3,4,5] },
+  { nome:"Responsabilita", idx:[6,7,8] },
+  { nome:"Work-Life Balance", idx:[9,10,11] },
+  { nome:"Attitudinali", idx:[12,13,14] },
+  { nome:"Problem Solving", idx:[15,16,17] },
+  { nome:"Motivazione", idx:[18,19,20] },
+  { nome:"Resistenza alla Pressione", idx:[21,22,23,24] },
+];
+
+let current = 0;
+let answers = new Array(D.length).fill(null);
+let candidato = {};
+
+function startQuiz() {
+  const nome = document.getElementById('f-nome').value.trim();
+  const email = document.getElementById('f-email').value.trim();
+  if (!nome || !email) { alert('Inserisci nome e email per continuare.'); return; }
+  candidato = { nome, email, tel: document.getElementById('f-tel').value.trim(), esp: document.getElementById('f-esp').value.trim() };
+  document.getElementById('screen-intro').classList.add('hidden');
+  document.getElementById('screen-quiz').classList.remove('hidden');
+  renderQ();
+}
+
+function renderQ() {
+  const d = D[current];
+  const total = D.length;
+  document.getElementById('progress-fill').style.width = Math.round((current/total)*100) + '%';
+  document.getElementById('progress-text').textContent = (current+1) + ' / ' + total;
+  document.getElementById('step-info').textContent = 'Domanda ' + (current+1) + ' di ' + total;
+
+  const trapBadge = d.trap ? '<span class="q-trap">DOMANDA CRITICA</span>' : '';
+  const optHtml = d.opts.map(o => `
+    <label class="option ${answers[current]===o.k?'selected':''}" onclick="selectOpt('${o.k}',this)">
+      <input type="radio" name="q" value="${o.k}" ${answers[current]===o.k?'checked':''}>
+      <div class="option-letter">${o.k.toUpperCase()}</div>
+      <div class="option-text">${o.t}</div>
+    </label>`).join('');
+
+  document.getElementById('quiz-content').innerHTML = `
+    <div class="quiz-card">
+      <div class="question-meta">
+        <span class="q-num">${current+1} / ${total}</span>
+        <span class="q-cat">${d.cat}</span>
+        ${trapBadge}
+      </div>
+      <div class="question-text">${d.q}</div>
+      ${optHtml}
+    </div>`;
+
+  document.getElementById('btn-prev').style.visibility = current===0?'hidden':'visible';
+  document.getElementById('btn-next').textContent = current===total-1 ? 'Vedi risultati →' : 'Avanti →';
+  document.getElementById('btn-next').disabled = answers[current]===null;
+}
+
+function selectOpt(key, el) {
+  answers[current] = key;
+  document.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('btn-next').disabled = false;
+}
+
+function nextQ() {
+  if (answers[current]===null) return;
+  if (current < D.length-1) { current++; renderQ(); }
+  else showResult();
+}
+
+function prevQ() {
+  if (current>0) { current--; renderQ(); }
+}
+
+function showResult() {
+  document.getElementById('screen-quiz').classList.add('hidden');
+  document.getElementById('screen-result').classList.remove('hidden');
+  document.getElementById('progress-fill').style.width = '100%';
+  document.getElementById('progress-text').textContent = 'Completato!';
+
+  const total = answers.reduce((s,a,i) => {
+    const opt = D[i].opts.find(o=>o.k===a);
+    return s + (opt ? opt.p : 0);
+  }, 0);
+
+  let bg, verdict, sub;
+  if (total >= 200) { bg='#166534'; verdict='Profilo Eccellente'; sub='Alto potenziale Würth. Candidato da non perdere.'; }
+  else if (total >= 160) { bg='#2563EB'; verdict='Profilo Forte'; sub='In linea con il profilo Würth. Procedi con il colloquio.'; }
+  else if (total >= 110) { bg='#856404'; verdict='Profilo da Valutare'; sub='Alcune aree da approfondire. Secondo colloquio consigliato.'; }
+  else { bg='#cc0000'; verdict='Profilo Non Adatto'; sub='Il profilo non e in linea con le esigenze Würth.'; }
+
+  document.getElementById('score-circle').style.background = bg;
+  document.getElementById('score-num').textContent = total;
+  document.getElementById('verdict-text').textContent = verdict;
+  document.getElementById('verdict-sub').textContent = sub;
+
+  document.getElementById('cat-grid').innerHTML = CATEGORIE_EVAL.map(cat => {
+    const score = cat.idx.reduce((s,i) => {
+      const opt = D[i].opts.find(o=>o.k===answers[i]);
+      return s + (opt ? opt.p : 0);
+    }, 0);
+    const max = cat.idx.length * 10;
+    const pct = Math.round(score/max*100);
+    const col = pct>=80?'#166534':pct>=50?'#856404':'#cc0000';
+    return `<div class="cat-item">
+      <div class="cat-name">${cat.nome}</div>
+      <div class="cat-score" style="color:${col}">${score} / ${max}</div>
+      <div style="background:#eee;border-radius:4px;height:4px;margin-top:5px;overflow:hidden">
+        <div style="width:${pct}%;height:100%;background:${col};border-radius:4px"></div>
+      </div>
+    </div>`;
+  }).join('');
+
+  submitResults(total);
+}
+
+function submitResults(totalScore) {
+  const total = totalScore || 0;
+  const catDettaglio = CATEGORIE_EVAL.map(cat => {
+    const score = cat.idx.reduce((s,i) => {
+      const opt = D[i].opts.find(o=>o.k===answers[i]);
+      return s + (opt ? opt.p : 0);
+    }, 0);
+    const max = cat.idx.length * 10;
+    return cat.nome + ': ' + score + '/' + max + ' (' + Math.round(score/max*100) + '%)';
+  }).join('\n');
+
+  const risposteDettaglio = D.map((d,i) => {
+    const opt = d.opts.find(o=>o.k===answers[i]);
+    return 'D'+(i+1)+' ['+d.cat+']: Risposta '+(answers[i]||'?').toUpperCase()+' — '+(opt?opt.p:0)+' punti'+(d.trap?' [CRITICA]':'');
+  }).join('\n');
+
+  let verdict = total>=200?'ECCELLENTE':total>=160?'PROFILO FORTE':total>=110?'DA VALUTARE':'NON ADATTO';
+
+  const fd = new FormData();
+  fd.append('_subject', 'Test Attitudinale Wurth — '+candidato.nome+' — '+total+'/250');
+  fd.append('Candidato', candidato.nome);
+  fd.append('Email', candidato.email);
+  fd.append('Telefono', candidato.tel||'—');
+  fd.append('Esperienza', candidato.esp||'—');
+  fd.append('Data', new Date().toLocaleString('it-IT'));
+  fd.append('PUNTEGGIO TOTALE', total+' / 250');
+  fd.append('VERDETTO', verdict);
+  fd.append('DETTAGLIO AREE', catDettaglio);
+  fd.append('DETTAGLIO RISPOSTE', risposteDettaglio);
+
+  fetch('https://formspree.io/f/FORMSPREE_ID', {
+    method:'POST', body:fd, headers:{'Accept':'application/json'}
+  }).then(r => {
+    if (r.ok) {
+      document.getElementById('sending-msg').textContent = 'Risultati inviati correttamente.';
+      setTimeout(()=>{
+        document.getElementById('screen-result').classList.add('hidden');
+        document.getElementById('screen-thanks').classList.remove('hidden');
+      }, 2000);
+    } else {
+      document.getElementById('sending-msg').textContent = 'Errore invio. Verifica la configurazione Formspree.';
+    }
+  }).catch(()=>{
+    document.getElementById('sending-msg').textContent = 'Errore di connessione. Riprova.';
+  });
+}
+</script>
+</body>
+</html>
